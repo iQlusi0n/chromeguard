@@ -1,0 +1,9 @@
+# Real WireGuard config — contains your PRIVATE key. Never commit it.
+# Start from wireproxy.conf.example instead.
+wireproxy.conf
+
+# macOS
+.DS_Store
+
+# logs
+*.log

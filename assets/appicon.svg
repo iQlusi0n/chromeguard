@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- VPN Chrome app icon source. Render to 1024x1024 PNG, then build the .icns
+     (macOS: put the PNG sizes in an .iconset and run `iconutil -c icns`). -->
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512">
+  <defs>
+    <clipPath id="sq"><rect x="6" y="6" width="500" height="500" rx="115" ry="115"/></clipPath>
+  </defs>
+  <!-- dark squircle -->
+  <rect x="6" y="6" width="500" height="500" rx="115" ry="115" fill="#202124"/>
+  <g clip-path="url(#sq)">
+    <!-- Chrome wheel -->
+    <path d="M256,196 L126.10,121.00 A150,150 0 0 1 385.90,121.00 Z" fill="#EA4335"/>
+    <path d="M256,196 L385.90,121.00 A150,150 0 0 1 256.00,346.00 Z" fill="#FBBC05"/>
+    <path d="M256,196 L256.00,346.00 A150,150 0 0 1 126.10,121.00 Z" fill="#34A853"/>
+    <circle cx="256" cy="196" r="80" fill="#ffffff"/>
+    <circle cx="256" cy="196" r="70" fill="#4285F4"/>
+    <!-- VPN band, text vertically centered in the band (y 352..506) -->
+    <rect x="0" y="352" width="512" height="160" fill="#D93025"/>
+    <text x="256" y="429" text-anchor="middle" dominant-baseline="central"
+          font-family="Arial, Helvetica, sans-serif" font-weight="800" font-size="118"
+          fill="#ffffff" letter-spacing="4">VPN</text>
+  </g>
+</svg>

@@ -1,0 +1,17 @@
+#!/usr/bin/env bash
+# App-bundle stub: launches the VPN Chrome workflow with no Terminal window.
+# It execs the sibling chrome-vpn.command (kept outside the bundle so the
+# WireGuard config, banner extension, and launcher stay easy to edit).
+set -euo pipefail
+
+EXE_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+# EXE_DIR = .../VPN Chrome.app/Contents/MacOS  ->  ROOT holds "VPN Chrome.app"
+ROOT="$(cd "${EXE_DIR}/../../.." && pwd)"
+LAUNCHER="${ROOT}/chrome-vpn.command"
+
+if [[ ! -x "${LAUNCHER}" ]]; then
+  osascript -e 'display alert "VPN Chrome" message "chrome-vpn.command was not found next to the app.\n\nKeep VPN Chrome.app in the same folder as chrome-vpn.command, wireproxy.conf, and banner-extension/."' >/dev/null 2>&1 || true
+  exit 1
+fi
+
+exec "${LAUNCHER}"

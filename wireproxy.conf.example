@@ -1,0 +1,28 @@
+# wireproxy config template — copy to wireproxy.conf and fill in your values:
+#   cp wireproxy.conf.example wireproxy.conf && chmod 600 wireproxy.conf
+# wireproxy.conf is git-ignored because it holds your WireGuard PRIVATE key.
+#
+# [Interface] / [Peer] use the same fields as a normal WireGuard wg0.conf.
+
+[Interface]
+PrivateKey = REPLACE_WITH_YOUR_PRIVATE_KEY
+# Your tunnel IP as assigned on the server (/32).
+Address = REPLACE_WITH_YOUR_TUNNEL_IP/32
+# Resolver used INSIDE the tunnel. 1.1.1.1 just works; use your router's LAN or
+# tunnel IP instead only if it is configured to answer DNS on the WireGuard
+# interface.
+DNS = 1.1.1.1
+# Tunnel MTU. Measure your path MTU (don't-fragment ping sweep) and subtract 60;
+# 1340 suits a 1400-byte path (typical of phone hotspots) and is safe on Wi-Fi.
+MTU = 1340
+
+[Peer]
+PublicKey = REPLACE_WITH_SERVER_PUBLIC_KEY
+# PresharedKey = REPLACE_WITH_PRESHARED_KEY
+Endpoint = REPLACE_WITH_SERVER_HOST:51820
+AllowedIPs = 0.0.0.0/0
+PersistentKeepalive = 25
+
+[Socks5]
+# Must match PROXY_PORT in chrome-vpn.command.
+BindAddress = 127.0.0.1:25344
