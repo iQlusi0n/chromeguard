@@ -1,0 +1,34 @@
+name: lint
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install shellcheck and xmllint
+        run: sudo apt-get update -q && sudo apt-get install -y -q shellcheck libxml2-utils
+
+      - name: shellcheck (all optional checks)
+        run: >
+          shellcheck -o all -S style
+          chrome-vpn.command
+          "VPN Chrome.app/Contents/MacOS/VPN Chrome"
+          scripts/*.sh
+
+      - uses: biomejs/setup-biome@v2
+        with:
+          version: 2.5.10
+
+      - name: biome (lint + format)
+        run: biome ci biome.json banner-extension
+
+      - name: XML well-formedness
+        run: xmllint --noout "VPN Chrome.app/Contents/Info.plist" assets/appicon.svg
+
+      - name: JSON validity
+        run: jq empty banner-extension/manifest.json biome.json

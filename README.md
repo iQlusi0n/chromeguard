@@ -19,6 +19,7 @@ chrome-vpn.command       the workflow the app runs (start tunnel -> launch Chrom
 wireproxy.conf.example   WireGuard/proxy config template -> copy to wireproxy.conf
 banner-extension/        on-page VPN banner + WebRTC leak protection
 assets/appicon.svg       icon source
+scripts/                 register-external-extension.sh (all-users extension install)
 ```
 
 The folder must stay **together**: the app runs its sibling
@@ -146,6 +147,29 @@ From Terminal, the same path as Chrome:
 curl -sS --socks5-hostname 127.0.0.1:25344 https://api.ipify.org; echo
 ```
 
+## Optional: install the extension for all users automatically
+
+By default each user loads the extension once via "Load unpacked". Chrome on
+macOS can instead install it for **every** user automatically, but **only from
+the Chrome Web Store** — Google does not allow local `.crx` files or
+self-hosted extensions to be force-installed on macOS. So:
+
+1. Publish `banner-extension/` to the Chrome Web Store (one-time $5 developer
+   registration). Set visibility to **Unlisted** — it won't appear in search,
+   only people with the link/ID can see it.
+2. Note the 32-character extension ID from its store URL.
+3. Register it on each Mac:
+
+   ```bash
+   sudo scripts/register-external-extension.sh <extension-id>
+   ```
+
+   This writes `/Library/Application Support/Google/Chrome/External Extensions/<id>.json`
+   with the correct ownership. On next launch Chrome installs it for all users;
+   each user confirms it once. Updates then flow from the store automatically.
+
+Remove with `sudo rm` of that JSON file.
+
 ## Customizing
 
 - **Banner** — `banner-extension/content.js`, the `CONFIG` block: `text`,
@@ -201,5 +225,14 @@ curl -sS --socks5-hostname 127.0.0.1:25344 https://api.ipify.org; echo
 
 ## Development
 
-`biome.json` configures lint/format for the extension (`biome check .`). Shell
-scripts pass `shellcheck -o all`.
+Lint runs in CI (`.github/workflows/lint.yml`) on every push and PR. Locally:
+
+```bash
+shellcheck -o all -S style chrome-vpn.command "VPN Chrome.app/Contents/MacOS/VPN Chrome" scripts/*.sh
+biome ci biome.json banner-extension
+xmllint --noout "VPN Chrome.app/Contents/Info.plist" assets/appicon.svg
+```
+
+## License
+
+[MIT](LICENSE).
