@@ -7,7 +7,11 @@ Chrome and every other app stay on the direct connection.
 How it works: [wireproxy](https://github.com/whyvl/wireproxy) runs WireGuard in
 userspace and exposes it as a local SOCKS5 proxy. A launcher starts that proxy
 and opens Chrome with a separate profile pointed at it. Nothing touches macOS
-system routing, so only this Chrome goes through the VPN.
+system routing, so only this Chrome goes through the VPN. The setup is
+**fail-closed**: the proxy is mandatory and every hostname is made unresolvable
+locally (`--host-resolver-rules`), so if the tunnel is down Chrome errors rather
+than leaking to the direct connection, and DNS can only happen remotely through
+the tunnel.
 
 ```
 VPN Chrome.app/          double-click to launch (no Terminal window)
@@ -117,7 +121,11 @@ Double-click **`VPN Chrome.app`**.
 - No Rosetta prompt: the bundle sets `LSRequiresNativeExecution`.
 
 Quit the VPN Chrome window (⌘Q) to stop; if the app started the tunnel it
-shuts `wireproxy` down on quit.
+shuts `wireproxy` down on quit (unless another user is still connected).
+
+When launched via the app there is no terminal, so progress is written to
+`~/Library/Logs/VPN Chrome.log` and any startup error is shown as a native
+alert. Running `chrome-vpn.command` in Terminal prints the same output live.
 
 ## 5. Verify
 
@@ -153,6 +161,9 @@ curl -sS --socks5-hostname 127.0.0.1:25344 https://api.ipify.org; echo
 
 ## Troubleshooting
 
+- **App won't start / error alert** — read `~/Library/Logs/VPN Chrome.log`
+  (per user) and the proxy log it points to. A bad config is caught up front by
+  `wireproxy -n` before anything starts.
 - **Nothing loads / `ERR_SOCKS_CONNECTION_FAILED`** — Chrome reached the proxy
   but the tunnel isn't passing traffic. Run the proxy in the foreground to see
   why: `wireproxy -c /Applications/VPN-Chrome/wireproxy.conf`.
@@ -182,8 +193,11 @@ curl -sS --socks5-hostname 127.0.0.1:25344 https://api.ipify.org; echo
   Customizing.
 - **Icon doesn't update** — `touch "/Applications/VPN-Chrome/VPN Chrome.app"`,
   `killall Dock Finder`, or log out/in.
-- **Several users at once** — one shared tunnel on `127.0.0.1:25344`; it stops
-  when the user who started it quits. Fine for one-at-a-time use.
+- **Several users at once** — one shared tunnel on `127.0.0.1:25344`. The
+  launcher leaves it running on quit while other clients are still connected,
+  so one user quitting won't cut another off; the process may then linger until
+  that first user logs out. For an always-on shared tunnel, run wireproxy as a
+  LaunchDaemon instead.
 
 ## Development
 

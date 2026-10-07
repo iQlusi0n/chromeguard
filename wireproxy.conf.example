@@ -20,6 +20,7 @@ MTU = 1340
 PublicKey = REPLACE_WITH_SERVER_PUBLIC_KEY
 # PresharedKey = REPLACE_WITH_PRESHARED_KEY
 Endpoint = REPLACE_WITH_SERVER_HOST:51820
+# Add ", ::/0" only if the server hands out an IPv6 tunnel address too.
 AllowedIPs = 0.0.0.0/0
 PersistentKeepalive = 25
 
